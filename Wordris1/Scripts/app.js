@@ -275,6 +275,7 @@
 
         h: 20,
 
+        limit: 100,
         
 
         // Where Falling Brick starts falling along with setting its letter and color
@@ -283,7 +284,7 @@
 
             this.x = 100;
 
-            this.y = 210;
+            this.y = 100;
 
             this.speed = 3;
 
@@ -301,7 +302,9 @@
 
             this.move();
 
-            
+            ctx.fillStyle = 'black';
+
+            ctx.fillRect(0, 0, Game.width, Game.height);
 
             ctx.fillStyle = this.color;
 
@@ -335,7 +338,7 @@
 
             // If falling brick is not at bottom AND there is no collision with a fallen brick
 
-            if ((this.y < (550 - this.h)) && !(Bricks.collide(this.x, this.y))){
+            if ((this.y < (Game.height - this.h)) && !(Bricks.collide(this.x, this.y))){
 
                 // Falling Brick moves down by 1
 
@@ -359,7 +362,7 @@
 
                 // If newly-fallen brick is over the limit (game-ending line)
 
-                if (this.y <= 210)
+                if (this.y <= FallingBrick.limit)
 
                 {
 
@@ -531,7 +534,7 @@
 
             // From 530 (top) to 210 (limit of bricks)
 
-            for (var y = 530; y > 210; y--)
+            for (var y = (Game.height - 20); y > FallingBrick.limit; y--)
 
             {
 
@@ -541,7 +544,7 @@
 
                 // 410 is width of canvas minus 50 (width of brick) = 360
 
-                for (var x = 0; x < 360; x++)
+                for (var x = 0; x < (Game.width - 50); x++)
 
                 {
 
@@ -825,7 +828,7 @@
 
                 // If x/y corner of brick matches anything in Brix1 array
 
-                while ((brix1[n].y < 530) && !(Bricks.collide2(brix1[n].x, brix1[n].y, n)))
+                while ((brix1[n].y < (Game.height - 20)) && !(Bricks.collide2(brix1[n].x, brix1[n].y, n)))
 
                 {
 
@@ -899,7 +902,7 @@
 
             window.addEventListener('keyup', this.keyUp, true);
 
-            window.addEventListener('mousemove', this.moveFallingBrick, true);
+            Game.canvas.addEventListener('mousemove', this.moveFallingBrick, true);
 
         },
 
@@ -969,7 +972,7 @@
 
             //console.log(mouseX);
 
-            var canvasX = Game.canvas.offsetLeft;
+            var canvasX = Game.canvas.offsetLeft + Game.canvas.parentElement.offsetLeft;
 
             var FallingBrickMid = FallingBrick.w;
 
