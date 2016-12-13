@@ -45,7 +45,7 @@
 
     // Letters of Alaphabet usable
 
-    var letters = ["A", "B", "C"];
+    var letters = ["A", "B", "C", "T"];
 
     //, "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
 
@@ -601,41 +601,45 @@
 
                         // Parse word to see if word contains a good word and get location of that good word in entire word
 
-                        coords = this.findSubWord(cList[x].word);
+                        this.findSubWord(cList[x].word, function (coords) {
 
-                        // if coords is returned and contains good word start and stop location
+                            debugger
+                            if (coords.length > 1) {
 
-                        if (coords.length > 1) {
+                                // cList[x].numb is list of brick numbers to remove
 
-                            // cList[x].numb is list of brick numbers to remove
-
-                            var werd = cList[x].numb;
-
+                                var werd = cList[x].numb;
 
 
-                            // make list of brick numbers for elimination
 
-                            var removePart1 = werd.splice(coords[0], (coords[1] - coords[0]) + 1);
+                                // make list of brick numbers for elimination
 
-                            // Sort the bricks that make up the word in reverse numerical order for elimination
+                                var removePart1 = werd.splice(coords[0], (coords[1] - coords[0]) + 1);
 
-                            removePart1.sort(function (a, b) { return b - a });
+                                // Sort the bricks that make up the word in reverse numerical order for elimination
 
-                            // for every letter in word, remove the letter
+                                removePart1.sort(function (a, b) { return b - a });
 
-                            for (var u = 0; u < removePart1.length; u++) {
+                                // for every letter in word, remove the letter
 
-                                // Remove bricks from Brick array that are in number list
+                                for (var u = 0; u < removePart1.length; u++) {
 
-                                brix1.splice(removePart1[u], 1);
+                                    // Remove bricks from Brick array that are in number list
+
+                                    brix1.splice(removePart1[u], 1);
+
+                                }
+                                // if coords is returned and contains good word start and stop location
+
+
 
                             }
 
-                        }
+                            // Assign current List to masterList
 
-                        // Assign current List to masterList
+                            masterWords[x] = cList[x];
+                        });
 
-                        masterWords[x] = cList[x];
 
                     }
 
@@ -647,7 +651,7 @@
 
 
 
-        findSubWord: function (daWord) {
+        findSubWord: function (daWord, cb) {
 
             var w;
 
@@ -669,31 +673,39 @@
 
                     if (!(this.isBadWord(w))) {
 
-                        // Check if word in Dictionary
+                        // Check if word in Database
+                        var s = this.isInDatabase(w);
+                        if (s != "-1"){
+                            // Return Start and Stop section of word that is in Dictionary
+                            nums.push(x);
+                            nums.push(y);
+                            defText.textContent = s;
+                            cb(nums);
+                        }
+                        else{
+                            this.isInDictionary(w, function (z) {
+                                //debugger
+                                if (z != "-1") {
 
-                        this.isInDictionary(w, function (z) {
-                            //debugger
-                            if (z != "-1") {
+                                    // Return Start and Stop section of word that is in Dictionary
+                                    nums.push(x);
+                                    nums.push(y);
+                                    console.log("nums: " + nums);
+                                    console.log("z = " + z);
+                                    defText.textContent = z;
+                                    cb(nums);
 
-                                // Return Start and Stop section of word that is in Dictionary
+                                }
+                                else {
+                                    // If not in Dictionary, then put in Array of known bad words
+                                    badWords.push(w);
+                                    cb();
+                                }
+                                
+                            });
+                        }
+                        
 
-                                nums.push(x);
-
-                                nums.push(y);
-
-                                return nums;
-
-                            }
-
-                            else {
-
-                                // If not in Dictionary, then put in Array of known bad words
-
-                                badWords.push(w);
-
-                            }
-
-                        });
 
                         // Dictionary returns "-1" string if not in Dictionary
 
@@ -713,7 +725,7 @@
 
         // Check if word is in Bad word array
 
-        isBadWord: function (daWord) {
+        isBadWord: function(daWord) {
 
             for (var x = 0; x < badWords.length; x++) {
 
@@ -730,11 +742,7 @@
         },
 
 
-
-        // Check if word in Dictionary API (currently just an array)
-
-        isInDictionary: function (daWord, cb) {
-
+        isInDatabase: function(daWord){
             for (var x = 0; x < dictList1.length; x++) {
 
                 if (daWord == dictList1[x].name) {
@@ -742,25 +750,35 @@
                     // If in dictionary then create word and definition string
 
                     var declareDef = dictList1[x].name + " - Definition: " + dictList1[x].definition;
+                    return declareDef;
+                }
+            }
+            return "-1";
+        },
 
-                    defText.textContent = declareDef;
+
+        // Check if word in Dictionary API (currently just an array)
+
+        isInDictionary: function (daWord, cb) {
+
+            
 
                     // Call Dictionary API
 
                     this.xhrTest(daWord, function (definition) {
-                        //debugger
-                        return cb(definition);
+                        if ((definition) || (definition != null)) {
+                            console.log("definition = " + definition);
+                            return cb(definition);
+                        }
+                        else {
+                            console.log("definition = -1");
+                            return cb("-1");
+                        }
                     });
-
-
-
-                }
-
-            }
 
             // If not in array, then return -1 as String
 
-            return "-1";
+            
 
         },
 
@@ -788,7 +806,7 @@
 
         // Print out contents of API request
 
-        reqListener: function (dataReq, cb) {
+        reqListener: function (dataReq, word, cb) {
 
             //debugger
             var definition = "";
@@ -797,7 +815,7 @@
             var obj = JSON.parse(x);
 
             if ((obj.results.length > 0) && (obj.results[0].senses[0].definition)) {
-                cb("SSSSSSSSSSSS " + obj.results[0].senses[0].definition);
+                cb(word + ": " + obj.results[0].senses[0].definition);
             }
             else {
                 console.log("obj.results.length = 0");
@@ -818,7 +836,7 @@
 
                 if (oReq.readyState === 4)
 
-                    Bricks.reqListener(oReq, cb)
+                    Bricks.reqListener(oReq, word1, cb)
 
             };
 
