@@ -49,6 +49,11 @@
 
     //, "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
 
+    var letterValues = [{letter: "A", value: 1}, {letter: "B", value: 2},{letter: "C", value: 3},{letter: "D", value: 1},{letter: "E", value: 1}, {letter: "F", value: 1}, {letter: "G", value: 1}, {letter: "H", value: 1},
+        {letter: "I", value: 1}, {letter: "J", value: 1}, {letter: "K", value: 1}, {letter: "L", value: 1}, {letter: "M", value: 1}, {letter: "N", value: 1}, {letter: "O", value: 1}, {letter: "P", value: 1},
+        {letter: "Q", value: 1}, {letter: "R", value: 1}, {letter: "S", value: 1},{letter: "T", value: 1}, {letter: "U", value: 1}, {letter: "V", value: 1}, {letter: "W", value: 1}, {letter: "X", value: 1},
+        {letter: "Y", value: 1}, {letter: "Z", value: 1}];
+
     var colors = ["red", "orange", "green", "purple", "blue"]
 
     // Used to allow game to replay
@@ -498,9 +503,7 @@
         process: function () {
 
             var words = this.getListOfWords();
-
             this.checkIfWords(words);
-
             this.moveBricksDown();
 
         },
@@ -513,15 +516,11 @@
 
             var temp2 = [];
 
-
-
             // From 530 (top) to 210 (limit of bricks)
 
             for (var y = (Game.height - 20) ; y > FallingBrick.limit; y--) {
 
                 temp2 = [];
-
-
 
                 // 410 is width of canvas minus 50 (width of brick) = 360
 
@@ -543,14 +542,9 @@
 
                     }
 
-
-
                 }
 
-
-
                 var temp3 = [];
-
                 var temp4 = [];
 
                 for (var z = 0; z < temp2.length; z++) {
@@ -578,78 +572,59 @@
         checkIfWords: function (cList) {
 
             var coords = [];
-
             coords.sort;
 
             // In beginning, there is no masterWords yet use first list of words
-
             if (masterWords.length == 0) {
-
                 masterWords = cList;
-
             }
 
             else {
 
                 // Parse list of words
-
-                for (var x = 0; x < cList.length; x++) {
-
-                    // If word in array of words doesn't match its counterpart in masterlist then change happened
-
-                    if (cList[x].word != masterWords[x].word) {
-
-                        // Parse word to see if word contains a good word and get location of that good word in entire word
-
-                        this.findSubWord(cList[x].word, function (coords) {
-
+                cList.forEach(function (element, index, array)
+                {
+                    if (element.word != masterWords[index].word)
+                    {
+                        Bricks.findSubWord(element.word, function(coords)
+                        {
                             debugger
                             if (coords.length > 1) {
-
-                                // cList[x].numb is list of brick numbers to remove
-
-                                var werd = cList[x].numb;
-
-
-
-                                // make list of brick numbers for elimination
-
+                                var werd = element.numb;
                                 var removePart1 = werd.splice(coords[0], (coords[1] - coords[0]) + 1);
 
-                                // Sort the bricks that make up the word in reverse numerical order for elimination
-
+                                var score = Bricks.computeScore(removePart1);
                                 removePart1.sort(function (a, b) { return b - a });
-
-                                // for every letter in word, remove the letter
-
                                 for (var u = 0; u < removePart1.length; u++) {
-
-                                    // Remove bricks from Brick array that are in number list
-
                                     brix1.splice(removePart1[u], 1);
-
                                 }
-                                // if coords is returned and contains good word start and stop location
-
-
-
                             }
-
-                            // Assign current List to masterList
-
-                            masterWords[x] = cList[x];
+                            masterWords[index] = element;
                         });
-
-
+                        // remove bricks
+                        
                     }
-
-                }
+                });
 
             }
-
         },
 
-
+        computeScore: function(rp1)
+        {
+            var score1 = 0;
+            for (var i = 0; i < rp1.length; i++)
+            {
+                for (var j = 0; j < letterValues.length; j++)
+                {
+                    if (letterValues[j].letter === brix1[rp1[i]].l)
+                    {
+                        score1 += letterValues[j].value;
+                    }
+                }
+            }
+            console.log("score1 = " + score1);
+            return score1;
+        },
 
         findSubWord: function (daWord, cb) {
 
@@ -699,7 +674,8 @@
                                 else {
                                     // If not in Dictionary, then put in Array of known bad words
                                     badWords.push(w);
-                                    cb();
+                                    console.log("w = " + w);
+                                    cb([1]);
                                 }
                                 
                             });
@@ -716,8 +692,6 @@
                 }
 
             }
-
-            return nums;
 
         },
 
