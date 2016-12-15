@@ -35,9 +35,7 @@
 
     // Array temporarily acting as dictionary in place of DB
 
-    var dictList1 = [{ name: "CAB", definition: "Going somewhere in someone else's car" },
-
-                    { name: "BAC", definition: "The side you sleep on" },
+    var dictList1 = [
 
                     { name: "BAABC", definition: "Test bad word with API" },
 
@@ -64,7 +62,7 @@
 
     var defText;
 
-
+    var cbStop = true;
 
 
 
@@ -586,23 +584,26 @@
                 {
                     if (element.word != masterWords[index].word)
                     {
+                        //debugger
                         Bricks.findSubWord(element.word, function(coords)
                         {
-                            debugger
+                            console.log("FindSubWord Coords = " + coords);
                             if (coords.length > 1) {
                                 var werd = element.numb;
+                                console.log("element.word = " + element.word + "| werd = " + werd);
                                 var removePart1 = werd.splice(coords[0], (coords[1] - coords[0]) + 1);
-
+                                console.log("removePart1 = " + removePart1);
                                 var score = Bricks.computeScore(removePart1);
                                 removePart1.sort(function (a, b) { return b - a });
                                 for (var u = 0; u < removePart1.length; u++) {
                                     brix1.splice(removePart1[u], 1);
                                 }
                             }
-                            masterWords[index] = element;
+                            
                         });
                         // remove bricks
-                        
+                        masterWords[index] = element;
+                        cbStop = true;
                     }
                 });
 
@@ -641,51 +642,54 @@
                 for (var y = (daWord.length - 1) ; y > x; y--) {
 
                     // w contains current substring
+                    if (cbStop) {
 
-                    w = daWord.substring(x, y + 1);
+                        w = daWord.substring(x, y + 1);
 
-                    // If not in badWords array
+                        // If not in badWords array
 
-                    if (!(this.isBadWord(w))) {
+                        if (!(this.isBadWord(w))) {
 
-                        // Check if word in Database
-                        var s = this.isInDatabase(w);
-                        if (s != "-1"){
-                            // Return Start and Stop section of word that is in Dictionary
-                            nums.push(x);
-                            nums.push(y);
-                            defText.textContent = s;
-                            cb(nums);
-                        }
-                        else{
-                            this.isInDictionary(w, function (z) {
-                                //debugger
-                                if (z != "-1") {
+                            // Check if word in Database
+                            var s = this.isInDatabase(w);
+                            if (s != "-1") {
+                                // Return Start and Stop section of word that is in Dictionary
+                                nums.push(x);
+                                nums.push(y);
+                                defText.textContent = s;
+                                cbStop = false;
+                                cb(nums);
+                            }
+                            else {
+                                this.isInDictionary(w, function (z) {
+                                    //debugger
+                                    if (z != "-1") {
 
-                                    // Return Start and Stop section of word that is in Dictionary
-                                    nums.push(x);
-                                    nums.push(y);
-                                    console.log("nums: " + nums);
-                                    console.log("z = " + z);
-                                    defText.textContent = z;
-                                    cb(nums);
+                                        // Return Start and Stop section of word that is in Dictionary
+                                        nums.push(x);
+                                        nums.push(y);
+                                        console.log("nums: " + nums);
+                                        console.log("z = " + z);
+                                        defText.textContent = z;
+                                        cbStop = false;
+                                        cb(nums);
 
-                                }
-                                else {
-                                    // If not in Dictionary, then put in Array of known bad words
-                                    badWords.push(w);
-                                    console.log("w = " + w);
-                                    cb([1]);
-                                }
-                                
-                            });
-                        }
-                        
+                                    }
+                                    else {
+                                        // If not in Dictionary, then put in Array of known bad words
+                                        badWords.push(w);
+                                        console.log("w = " + w);
+                                        cb([1]);
+                                    }
+
+                                });
+                            }
+
 
 
                         // Dictionary returns "-1" string if not in Dictionary
 
-
+                        }
 
                     }
 
@@ -788,11 +792,17 @@
 
             var obj = JSON.parse(x);
 
-            if ((obj.results.length > 0) && (obj.results[0].senses[0].definition)) {
-                cb(word + ": " + obj.results[0].senses[0].definition);
+            if (obj.results.length > 0){
+                if (obj.results[0].senses[0].definition) {
+                    cb(word + ": " + obj.results[0].senses[0].definition);
+                }
+                else{
+                    cb("-1");
+                } 
             }
             else {
                 console.log("obj.results.length = 0");
+                cb("-1");
             }
             console.log(obj);
 
@@ -809,7 +819,6 @@
             oReq.onreadystatechange = function () {
 
                 if (oReq.readyState === 4)
-
                     Bricks.reqListener(oReq, word1, cb)
 
             };
