@@ -69,7 +69,6 @@
     var Game = {
 
         // Setup configuration
-
         canvas: document.getElementById('canvas'),
 
         setup: function () {
@@ -77,37 +76,24 @@
             if (this.canvas.getContext) {
 
                 // Setup variables
-
                 ctx = this.canvas.getContext('2d');
 
-
-
                 // Cache width and height of the Canvas to save processing power
-
                 this.width = this.canvas.width;
-
                 this.height = this.canvas.height;
 
-
-
                 // Run the game and show Welcome screen
-
                 Screen.welcome();
 
                 // Mousebutton click to activate game
-
                 this.canvas.addEventListener('click', this.runGame, false);
-
                 Ctrl.init();
 
                 //setTimeout(Ctrl.init, 100000);
 
-
-
             }
 
             // Div where Word Definition will go
-
             defText = document.getElementById('def');
 
         },
@@ -117,7 +103,6 @@
         init: function () {
 
             // Create a falling brick
-
             FallingBrick.init();
 
         },
@@ -127,16 +112,11 @@
         runGame: function () {
 
             // After mousebutton clicked, remove the EventListener
-
             Game.canvas.removeEventListener('click', Game.runGame, false);
-
             Game.init();
 
             // Run animation
-
             Game.animate();
-
-
 
         },
 
@@ -154,16 +134,9 @@
 
             Game.play = requestAnimFrame(Game.animate);
 
-
-
             if (again) {
-
                 Game.draw();
-
             }
-
-
-
         },
 
 
@@ -171,15 +144,12 @@
         draw: function () {
 
             // Clear out old Game
-
             ctx.clearRect(0, 0, this.width, this.height);
 
             // Draw the new Falling Brick
-
             FallingBrick.draw();
 
             // Draw the bricks that already fell
-
             Bricks.draw();
 
         }
@@ -190,8 +160,6 @@
 
     var Screen = {
 
-
-
         // Contents of Welcom Screen
 
         welcome: function () {
@@ -199,15 +167,10 @@
             // Setup base values
 
             this.text = 'Wordris';
-
             this.textSub = 'Click To Start';
-
             this.textColor = 'white';
 
-
-
             // Create screen
-
             this.create();
 
         },
@@ -219,12 +182,8 @@
         gameover: function () {
 
             this.text = 'Game Over';
-
             this.textSub = 'Click To Retry';
-
             this.textColor = 'red';
-
-
 
             this.create();
 
@@ -661,14 +620,17 @@
                                 cb(nums);
                             }
                             else {
-                                this.isInDictionary(w, function (z) {
+                                var a = x;
+                                var b = y;
+                                console.log("x = " + x + " y = " + y)
+                                this.isInDictionary(w, x, y, function (z, q, r) {
                                     //debugger
                                     if (z != "-1") {
 
                                         // Return Start and Stop section of word that is in Dictionary
-                                        nums.push(x);
-                                        nums.push(y);
-                                        console.log("nums: " + nums);
+                                        nums.push(q);
+                                        nums.push(r);
+                                        console.log("pushed nums: " + nums);
                                         console.log("z = " + z);
                                         defText.textContent = z;
                                         cbStop = false;
@@ -737,7 +699,7 @@
 
         // Check if word in Dictionary API (currently just an array)
 
-        isInDictionary: function (daWord, cb) {
+        isInDictionary: function (daWord, x, y, cb) {
 
             
 
@@ -746,11 +708,11 @@
                     this.xhrTest(daWord, function (definition) {
                         if ((definition) || (definition != null)) {
                             console.log("definition = " + definition);
-                            return cb(definition);
+                            return cb(definition, x, y);
                         }
                         else {
                             console.log("definition = -1");
-                            return cb("-1");
+                            return cb("-1", x, y);
                         }
                     });
 
