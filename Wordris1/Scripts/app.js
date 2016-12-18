@@ -61,9 +61,11 @@
     // Area where HTML where definition is displayed
 
     var defText;
+    var scoreText;
 
     var cbStop = true;
 
+    var totalScore = 0;
 
 
     var Game = {
@@ -95,6 +97,7 @@
 
             // Div where Word Definition will go
             defText = document.getElementById('def');
+            scoreText = document.getElementById('tScore');
 
         },
 
@@ -183,6 +186,7 @@
 
             this.text = 'Game Over';
             this.textSub = 'Click To Retry';
+            
             this.textColor = 'red';
 
             this.create();
@@ -334,7 +338,9 @@
                     // Put up Gameover screen
 
                     Screen.gameover();
-
+                    totalScore = 0;
+                    defText.textContent = "";
+                    scoreText.textContent = "";
                     // Again is false so game doesn't restart automatically
 
                     again = false;
@@ -350,7 +356,6 @@
                     // If not at or over gameover line, then start again with new falling brick
 
                     Game.init();
-
                 }
 
 
@@ -461,6 +466,7 @@
 
             var words = this.getListOfWords();
             this.checkIfWords(words);
+            scoreText.textContent = ("Score: " + totalScore);
             this.moveBricksDown();
 
         },
@@ -528,8 +534,10 @@
 
         checkIfWords: function (cList) {
 
+            var score = 0;
+            console.log("Start score" + score);
             var coords = [];
-            coords.sort;
+            //coords.sort;
 
             // In beginning, there is no masterWords yet use first list of words
             if (masterWords.length == 0) {
@@ -552,13 +560,15 @@
                                 console.log("element.word = " + element.word + "| werd = " + werd);
                                 var removePart1 = werd.splice(coords[0], (coords[1] - coords[0]) + 1);
                                 console.log("removePart1 = " + removePart1);
-                                var score = Bricks.computeScore(removePart1);
+                                score += Bricks.computeScore(removePart1);
+                                console.log("QWERT - score" + score);
+                                totalScore += score;
                                 removePart1.sort(function (a, b) { return b - a });
                                 for (var u = 0; u < removePart1.length; u++) {
                                     brix1.splice(removePart1[u], 1);
                                 }
                             }
-                            
+
                         });
                         // remove bricks
                         masterWords[index] = element;
@@ -626,7 +636,7 @@
                                 this.isInDictionary(w, x, y, function (z, q, r) {
                                     //debugger
                                     if (z != "-1") {
-
+                                        nums = [];
                                         // Return Start and Stop section of word that is in Dictionary
                                         nums.push(q);
                                         nums.push(r);
