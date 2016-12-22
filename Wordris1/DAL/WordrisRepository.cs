@@ -20,13 +20,13 @@ namespace Wordris1.DAL
             Context = new WordrisContext();
         }
 
-        public void AddWord(string theWord, bool isWord, string definition)
+        public void AddWord(Word werd)
         {
             Word new_word = new Models.Word
             {
-                TheWord = theWord,
-                IsWord = isWord,
-                Definition = definition,
+                TheWord = werd.TheWord,
+                IsWord = werd.IsWord,
+                Definition = werd.Definition,
                 Usage = 1
             };
 
@@ -47,14 +47,29 @@ namespace Wordris1.DAL
             }
         }
 
-        public bool IsBadWord(string theWord)
+        public string IsBadWord(string theWord)
         {
-            if (this.WordExists(theWord))
+            Word findWord = Context.Words.FirstOrDefault(u => ((u.TheWord.ToLower() == theWord) && (u.IsWord == false)));
+            if (findWord != null)
             {
-                if (Context.Words.(u => u.IsWord == false))
+                return "true";
             }
-                ){
+            else
+            {
+                return "false";
+            }
+        }
 
+        public string IsGoodWord(string theWord)
+        {
+            Word findWord = Context.Words.FirstOrDefault(u => ((u.TheWord.ToLower() == theWord) && (u.IsWord)));
+            if (findWord != null)
+            {
+                return findWord.Definition;
+            }
+            else
+            {
+                return "false";
             }
         }
     }
