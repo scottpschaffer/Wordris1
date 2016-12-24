@@ -52,10 +52,11 @@
         {letter: "Q", value: 1}, {letter: "R", value: 1}, {letter: "S", value: 1},{letter: "T", value: 1}, {letter: "U", value: 1}, {letter: "V", value: 1}, {letter: "W", value: 1}, {letter: "X", value: 1},
         {letter: "Y", value: 1}, {letter: "Z", value: 1}];
 
-    var colors = ["red", "orange", "green", "purple", "blue"]
+    var colors = ["red", "orange", "green", "purple", "blue"];
+
+    var upcomingLetters = [];
 
     // Used to allow game to replay
-
     var again = true;
 
     // Area where HTML where definition is displayed
@@ -81,7 +82,7 @@
                 ctx = this.canvas.getContext('2d');
 
                 // Cache width and height of the Canvas to save processing power
-                this.width = this.canvas.width;
+                this.width = this.canvas.width - 90;
                 this.height = this.canvas.height;
 
                 // Run the game and show Welcome screen
@@ -163,7 +164,7 @@
 
     var Screen = {
 
-        // Contents of Welcom Screen
+        // Contents of Welcome Screen
 
         welcome: function () {
 
@@ -236,11 +237,9 @@
     var FallingBrick = {
 
         // Dimensions of a brick
-
         w: 50,
-
         h: 20,
-
+        // Line that bricks can't go over
         limit: 100,
 
 
@@ -249,18 +248,29 @@
         init: function () {
 
             this.x = 100;
-
             this.y = 100;
 
             this.speed = 5;
 
-            this.letter = letters[Math.floor(Math.random() * letters.length)];
-
-            this.color = colors[Math.floor(Math.random() * colors.length)];
+            var fallBrick = this.organize();
+            this.letter = fallBrick.l;
+            this.color = fallBrick.c;
 
         },
 
-
+        organize: function (){
+            // Check if 9 items in list otherwise insert howevermuch is left => 9 - falling brick = 8
+            //debugger;
+            ul = upcomingLetters.length
+            for (var a = 0; a < 9 - ul; a++)
+            {
+                var letter1 = letters[Math.floor(Math.random() * letters.length)];
+                var color1 = colors[Math.floor(Math.random() * colors.length)];
+                upcomingLetters.push({l: letter1, c: color1});
+            }
+            // Shift first in List and return it
+            return upcomingLetters.shift();
+        },
 
         // Draws and re-draws the falling brick as its location moves
 
@@ -273,6 +283,18 @@
                 ctx.fillStyle = 'black';
                 ctx.fillRect(0, 0, Game.width, Game.height);
 
+                // Upcoming Bricks section
+                ctx.fillStyle = "gray";
+                ctx.fillRect(Game.width, 0, 90, Game.height);
+                ctx.fillStyle = "white";
+                ctx.fillText("Upcoming Bricks", Game.width + 45, 20, 80);
+                for (var b = 0; b < upcomingLetters.length; b++)
+                {
+                    ctx.fillStyle = upcomingLetters[b].c;
+                    ctx.fillRect(Game.width + 20, (b + 1) * 50 + 20, 50, 20);
+                    ctx.fillStyle = "white";
+                    ctx.fillText(upcomingLetters[b].l, Game.width + 45, (b + 1) * 50 + 37, 20);
+                }
                 // Paint Brick
                 ctx.fillStyle = this.color;
                 ctx.fillRect(this.x, this.y, this.w, this.h);
@@ -563,6 +585,7 @@
                                 score += Bricks.computeScore(removePart1);
                                 console.log("QWERT - score" + score);
                                 totalScore += score;
+                                scoreText.textContent = ("Score: " + totalScore);
                                 removePart1.sort(function (a, b) { return b - a });
                                 for (var u = 0; u < removePart1.length; u++) {
                                     brix1.splice(removePart1[u], 1);
