@@ -72,5 +72,21 @@ namespace Wordris1.DAL
                 return "false";
             }
         }
+
+        public void AddScore(Score theScore)
+        {
+            Context.Scores.Add(theScore);
+            Context.SaveChanges();
+        }
+
+        public List<int> GetPlayerScores()
+        {
+            return Context.Scores.Select(u => u.PlayerScore).ToList();
+        }
+
+        public List<string> GetPlayerNames()
+        {
+            return Context.Scores.Select(u => u.PlayerName).ToList();
+        }
     }
 }

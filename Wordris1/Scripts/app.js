@@ -68,6 +68,9 @@
 
     var totalScore = 0;
 
+    var highScorePlayers = [];
+    var playerList = [];
+
 
     var Game = {
 
@@ -187,51 +190,73 @@
 
             this.text = 'Game Over';
             this.textSub = 'Click To Retry';
-            
             this.textColor = 'red';
-
             this.create();
-
+            console.log("playerList.length before=" + playerList.length);
+            var player = prompt("Your score is " + totalScore + ". Please enter your name", "Player Name");
+            playerList.push({ p: player, s: totalScore });
+            console.log("playerList.length after=" + playerList.length);
+            highScorePlayers = this.highScoreA(playerList);
+            console.log("playerList.length=afterafter = " + playerList.length);
+            ctx.fillStyle = "lawngreen";
+            for (var x = 0; x < highScorePlayers.length; x++)
+            {
+                ctx.fillText((x + 1) + ". " + highScorePlayers[0].p + ": " + highScorePlayers[0].s, Game.width / 2, Game.height / 2 + (50 * (x + 1)));
+            }
+            
         },
 
-
+        highScoreA: function(pl){
+            var hsPlayers = [];
+            var tempLocation = 0;
+            for (x = 0; x < 5; x++)
+            {
+                if (pl.length > 0)
+                {
+                    var tempScore = pl[0].s;
+                    var numb = 0;
+                    while (numb < pl.length)
+                    {
+                        if (tempScore < pl[numb].s)
+                        {
+                            tempScore = pl[numb].s;
+                            tempLocation = numb;
+                        }
+                        numb++;
+                    }
+                    hsPlayers.push({ p: pl[tempLocation].p, s: pl[tempLocation].s });
+                    pl.splice(tempLocation, 1);
+                }
+                else
+                {
+                    break;
+                }
+            }
+            console.log("hsPlayers.length: " + hsPlayers.length);
+            return hsPlayers;
+        },
 
         // Create the Welcome or Game Over screen
-
         create: function () {
 
             // Background
-
             ctx.fillStyle = 'black';
-
             ctx.fillRect(0, 0, Game.width, Game.height);
 
-
-
             // Main text
-
             ctx.fillStyle = this.textColor;
-
             ctx.textAlign = 'center';
-
             ctx.font = '40px helvetica, arial';
-
             ctx.fillText(this.text, Game.width / 2, Game.height / 2);
 
-
-
             // Sub text
-
             ctx.fillStyle = '#999999';
-
             ctx.font = '20px helvetica, arial';
-
             ctx.fillText(this.textSub, Game.width / 2, Game.height / 2 + 30);
 
         }
 
     };
-
 
 
     var FallingBrick = {
@@ -464,7 +489,7 @@
 
                 // Prevent Brick from comparing itself 
 
-                if (j != n2) {
+                if (j !== n2) {
 
                     if ((((x2 + 50) > brix1[j].x) && ((x2 + 50) <= (brix1[j].x + 50)) || (x2 >= brix1[j].x) && (x2 < (brix1[j].x + 50))) && (((y2 + 20) >= brix1[j].y) && ((y2 + 20) <= (brix1[j].y + 20)))) {
 
@@ -517,7 +542,7 @@
 
                         // If x/y corner of brick matches anything in list of bricks
 
-                        if ((x == brix1[n].x) && (y == brix1[n].y)) {
+                        if ((x === brix1[n].x) && (y === brix1[n].y)) {
 
                             // Add the letter and brick # to list
 
@@ -562,7 +587,7 @@
             //coords.sort;
 
             // In beginning, there is no masterWords yet use first list of words
-            if (masterWords.length == 0) {
+            if (masterWords.length === 0) {
                 masterWords = cList;
             }
 
@@ -571,7 +596,7 @@
                 // Parse list of words
                 cList.forEach(function (element, index, array)
                 {
-                    if (element.word != masterWords[index].word)
+                    if (element.word !== masterWords[index].word)
                     {
                         //debugger
                         Bricks.findSubWord(element.word, function(coords)
@@ -644,7 +669,7 @@
 
                             // Check if word in Database
                             var s = this.isInDatabase(w);
-                            if (s != "-1") {
+                            if (s !== "-1") {
                                 // Return Start and Stop section of word that is in Dictionary
                                 nums.push(x);
                                 nums.push(y);
@@ -658,7 +683,7 @@
                                 console.log("x = " + x + " y = " + y)
                                 this.isInDictionary(w, x, y, function (z, q, r) {
                                     //debugger
-                                    if (z != "-1") {
+                                    if (z !== "-1") {
                                         nums = [];
                                         // Return Start and Stop section of word that is in Dictionary
                                         nums.push(q);
@@ -702,7 +727,7 @@
 
             for (var x = 0; x < badWords.length; x++) {
 
-                if (daWord == badWords[x]) {
+                if (daWord === badWords[x]) {
 
                     return true;
 
@@ -718,7 +743,7 @@
         isInDatabase: function(daWord){
             for (var x = 0; x < dictList1.length; x++) {
 
-                if (daWord == dictList1[x].name) {
+                if (daWord === dictList1[x].name) {
 
                     // If in dictionary then create word and definition string
 
