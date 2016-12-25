@@ -9,12 +9,13 @@ using Wordris1.DAL;
 using Wordris1.Models;
 
 namespace Wordris1.Controllers
-{
-    public class WordController : ApiController
+{ }
+
+    public class ScoreController : ApiController
     {
 
         WordrisRepository Repo = new WordrisRepository();
-        
+
         // GET api/<controller>
         public IEnumerable<string> Get()
         {
@@ -22,25 +23,22 @@ namespace Wordris1.Controllers
         }
 
         // GET api/<controller>/5
-        public string Get(string werd, bool isWerd)
+        public List<Score> Get(int id)
         {
-            if (isWerd)
+            List<Score> ret_score = new List<Score>();
+            List<int> scoreNums = Repo.GetPlayerScores();
+            List<string> scoreNames = Repo.GetPlayerNames();
+            for (var x = 0; x < scoreNums.Count; x++)
             {
-                return Repo.IsGoodWord(werd);
+                ret_score.Add(scoreNames[x], scoreNums[x]);
             }
-            else
-            {
-                return Repo.IsBadWord(werd).ToString();
-            }
+            return ret_score;
         }
 
         // POST api/<controller>
-        public void Post([FromBody]Word werd)
+        public void Post([FromBody]Score score)
         {
-            if (!(Repo.WordExists(werd.TheWord)))
-            {
-                Repo.AddWord(werd);
-            }
+            Repo.AddScore(score);
         }
 
         // PUT api/<controller>/5
