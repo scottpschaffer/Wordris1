@@ -49,27 +49,27 @@ namespace Wordris1.DAL
 
         public string IsBadWord(string theWord)
         {
-            Word findWord = Context.Words.FirstOrDefault(u => ((u.TheWord.ToLower() == theWord) && (u.IsWord == false)));
+            Word findWord = Context.Words.FirstOrDefault(u => ((u.TheWord.ToLower() == theWord.ToLower()) && (u.IsWord == false)));
             if (findWord != null)
             {
                 return "true";
             }
             else
             {
-                return "false";
+                return "-1";
             }
         }
 
         public string IsGoodWord(string theWord)
         {
-            Word findWord = Context.Words.FirstOrDefault(u => ((u.TheWord.ToLower() == theWord) && (u.IsWord)));
+            Word findWord = Context.Words.FirstOrDefault(u => ((u.TheWord.ToLower() == theWord.ToLower()) && (u.IsWord)));
             if (findWord != null)
             {
                 return findWord.Definition;
             }
             else
             {
-                return "false";
+                return "-1";
             }
         }
 

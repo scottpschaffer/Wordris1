@@ -22,15 +22,15 @@ namespace Wordris1.Controllers
         }
 
         // GET api/<controller>/5
-        public string Get(string werd, bool isWerd)
+        public string Get(string werd)
         {
-            if (isWerd)
+            if (Repo.IsBadWord(werd) == "true")
             {
-                return Repo.IsGoodWord(werd);
+                return "true";
             }
             else
             {
-                return Repo.IsBadWord(werd).ToString();
+                return Repo.IsGoodWord(werd);
             }
         }
 

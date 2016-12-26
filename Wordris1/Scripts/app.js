@@ -647,25 +647,22 @@
         findSubWord: function (daWord, cb) {
 
             var w;
-
             var nums = [];
 
             // daword.length - 2 because ignore words that are 1 letter long
-
             for (var x = 0; x < (daWord.length - 2) ; x++) {
-
                 // Start from end of word and go backwards
-
                 for (var y = (daWord.length - 1) ; y > x; y--) {
-
                     // w contains current substring
                     if (cbStop) {
-
                         w = daWord.substring(x, y + 1);
 
                         // If not in badWords array
-
-                        if (!(this.isBadWord(w))) {
+                        this.isGoodBadXHR(w, function (inDict) {
+                            if (!(isBool)){
+                                this.isGoodGetXHR(w, function)
+                            }
+                        })
 
                             // Check if word in Database
                             var s = this.isInDatabase(w);
@@ -723,19 +720,15 @@
 
         // Check if word is in Bad word array
 
-        isBadWord: function(daWord) {
+        isBadGetXHR: function(Word2, cb) {
 
-            for (var x = 0; x < badWords.length; x++) {
-
-                if (daWord === badWords[x]) {
-
-                    return true;
-
-                }
-
+            var oReq = new XMLHttpRequest();
+            oReq.onreadystatechange = function () {
+                if (oReq.readyState === 4)
+                    cb(this.response === 'true');
             }
-
-            return false;
+            oReq.Open("GET", "api/Word?werd=" + Word2 + "&isWerd=false");
+            oReq.send();
 
         },
 
