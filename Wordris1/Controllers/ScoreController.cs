@@ -9,7 +9,7 @@ using Wordris1.DAL;
 using Wordris1.Models;
 
 namespace Wordris1.Controllers
-{ }
+{
 
     public class ScoreController : ApiController
     {
@@ -26,11 +26,14 @@ namespace Wordris1.Controllers
         public List<Score> Get(int id)
         {
             List<Score> ret_score = new List<Score>();
+            Score tempScore = new Models.Score();
             List<int> scoreNums = Repo.GetPlayerScores();
             List<string> scoreNames = Repo.GetPlayerNames();
             for (var x = 0; x < scoreNums.Count; x++)
             {
-                ret_score.Add(scoreNames[x], scoreNums[x]);
+                tempScore.PlayerName = scoreNames[x];
+                tempScore.PlayerScore = scoreNums[x];
+                ret_score.Add(tempScore);
             }
             return ret_score;
         }

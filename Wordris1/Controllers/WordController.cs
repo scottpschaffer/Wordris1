@@ -35,11 +35,15 @@ namespace Wordris1.Controllers
         }
 
         // POST api/<controller>
-        public void Post([FromBody]Word werd)
+        public void Post([FromBody]string werd, bool inDict, string def)
         {
-            if (!(Repo.WordExists(werd.TheWord)))
+            Word w = new Word();
+            w.TheWord = werd;
+            w.IsWord = inDict;
+            w.Definition = def;
+            if (!(Repo.WordExists(werd)))
             {
-                Repo.AddWord(werd);
+                Repo.AddWord(w);
             }
         }
 

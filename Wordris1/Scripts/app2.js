@@ -283,14 +283,15 @@
 
         },
 
-        organize: function () {
+        organize: function (){
             // Check if 9 items in list otherwise insert howevermuch is left => 9 - falling brick = 8
             //debugger;
-            ul = upcomingLetters.length;
-            for (var a = 0; a < 9 - ul; a++) {
+            ul = upcomingLetters.length
+            for (var a = 0; a < 9 - ul; a++)
+            {
                 var letter1 = letters[Math.floor(Math.random() * letters.length)];
                 var color1 = colors[Math.floor(Math.random() * colors.length)];
-                upcomingLetters.push({ l: letter1, c: color1 });
+                upcomingLetters.push({l: letter1, c: color1});
             }
             // Shift first in List and return it
             return upcomingLetters.shift();
@@ -312,7 +313,8 @@
                 ctx.fillRect(Game.width, 0, 90, Game.height);
                 ctx.fillStyle = "white";
                 ctx.fillText("Upcoming Bricks", Game.width + 45, 20, 80);
-                for (var b = 0; b < upcomingLetters.length; b++) {
+                for (var b = 0; b < upcomingLetters.length; b++)
+                {
                     ctx.fillStyle = upcomingLetters[b].c;
                     ctx.fillRect(Game.width + 20, (b + 1) * 50 + 20, 50, 20);
                     ctx.fillStyle = "white";
@@ -413,7 +415,7 @@
 
 
 
-    };
+    }
 
 
 
@@ -526,13 +528,13 @@
 
             // From 530 (top) to 210 (limit of bricks)
 
-            for (var y = (Game.height - 20); y > FallingBrick.limit; y--) {
+            for (var y = (Game.height - 20) ; y > FallingBrick.limit; y--) {
 
                 temp2 = [];
 
                 // 410 is width of canvas minus 50 (width of brick) = 360
 
-                for (var x = 0; x < (Game.width - 50); x++) {
+                for (var x = 0; x < (Game.width - 50) ; x++) {
 
                     // Go through every brick in list
 
@@ -580,7 +582,7 @@
         checkIfWords: function (cList) {
 
             var score = 0;
-            //console.log("Start score" + score);
+            console.log("Start score" + score);
             var coords = [];
             //coords.sort;
 
@@ -599,14 +601,14 @@
                         //debugger
                         Bricks.findSubWord(element.word, function(coords)
                         {
-                            //console.log("FindSubWord Coords = " + coords);
+                            console.log("FindSubWord Coords = " + coords);
                             if (coords.length > 1) {
                                 var werd = element.numb;
-                               // console.log("element.word = " + element.word + "| werd = " + werd);
+                                console.log("element.word = " + element.word + "| werd = " + werd);
                                 var removePart1 = werd.splice(coords[0], (coords[1] - coords[0]) + 1);
-                               // console.log("removePart1 = " + removePart1);
+                                console.log("removePart1 = " + removePart1);
                                 score += Bricks.computeScore(removePart1);
-                               // console.log("QWERT - score" + score);
+                                console.log("QWERT - score" + score);
                                 totalScore += score;
                                 scoreText.textContent = ("Score: " + totalScore);
                                 removePart1.sort(function (a, b) { return b - a });
@@ -638,90 +640,118 @@
                     }
                 }
             }
-            //console.log("score1 = " + score1);
+            console.log("score1 = " + score1);
             return score1;
         },
 
         findSubWord: function (daWord, cb) {
 
             var w;
+
             var nums = [];
 
             // daword.length - 2 because ignore words that are 1 letter long
-            for (var x = 0; x < (daWord.length - 2); x++) {
+
+            for (var x = 0; x < (daWord.length - 2) ; x++) {
+
                 // Start from end of word and go backwards
-                for (var y = (daWord.length - 1); y > x; y--) {
+
+                for (var y = (daWord.length - 1) ; y > x; y--) {
+
                     // w contains current substring
                     if (cbStop) {
-                        w = daWord.substring(x, y + 1);
-                        debugger;
-                        // If not in badWords array
-                        this.isGoodBadXHR(w, function (inDict) {
-                            if (inDict !== "true") {
-                                if (inDict !== "-1") {
-                                    nums.push(x);
-                                    nums.push(y);
-                                    defText.textContent = inDict;
-                                    cbStop = false;
-                                    cb(nums);
-                                }
-                                else {
-                                    var a = x;
-                                    var b = y;
-                                    var ret = "";
-                                    var inDictionary = false;
 
-                                    this.isInDictionary(w, x, y, function (z, q, r) {
-                                        //debugger
-                                        if (z !== "-1") {
-                                            nums = [];
-                                            // Return Start and Stop section of word that is in Dictionary
-                                            nums.push(q);
-                                            nums.push(r);
-                                           // console.log("pushed nums: " + nums);
-                                           // console.log("z = " + z);
-                                            defText.textContent = z;
-                                            cbStop = false;
-                                            inDictionary = true;
-                                            ret = nums;
-                                        }
-                                        else {
-                                            inDictionary = false;
-                                            ret = ["filler"];
-                                        }
-                                        this.putInDictionary(w, inDictionary, z);
-                                        cb(ret);
-                                    });
-                                }
+                        w = daWord.substring(x, y + 1);
+
+                        // If not in badWords array
+
+                        if (!(this.isBadWord(w))) {
+
+                            // Check if word in Database
+                            var s = this.isInDatabase(w);
+                            if (s !== "-1") {
+                                // Return Start and Stop section of word that is in Dictionary
+                                nums.push(x);
+                                nums.push(y);
+                                defText.textContent = s;
+                                cbStop = false;
+                                cb(nums);
                             }
-                        });
+                            else {
+                                var a = x;
+                                var b = y;
+                                console.log("x = " + x + " y = " + y)
+                                this.isInDictionary(w, x, y, function (z, q, r) {
+                                    //debugger
+                                    if (z !== "-1") {
+                                        nums = [];
+                                        // Return Start and Stop section of word that is in Dictionary
+                                        nums.push(q);
+                                        nums.push(r);
+                                        console.log("pushed nums: " + nums);
+                                        console.log("z = " + z);
+                                        defText.textContent = z;
+                                        cbStop = false;
+                                        cb(nums);
+
+                                    }
+                                    else {
+                                        // If not in Dictionary, then put in Array of known bad words
+                                        badWords.push(w);
+                                        console.log("w = " + w);
+                                        cb([1]);
+                                    }
+
+                                });
+                            }
+
+
+
+                        // Dictionary returns "-1" string if not in Dictionary
+
+                        }
+
                     }
+
                 }
+
             }
+
         },
 
 
 
         // Check if word is in Bad word array
 
-        isGoodBadXHR: function(Word2, cb) {
+        isBadWord: function(daWord) {
 
-            var oReq = new XMLHttpRequest();
-            oReq.onreadystatechange = function () {
-                if (oReq.readyState === 1)
-                    cb(oReq.response);
-            };
-            oReq.open("GET", "api/Word?werd=" + Word2);
-            oReq.send();
+            for (var x = 0; x < badWords.length; x++) {
+
+                if (daWord === badWords[x]) {
+
+                    return true;
+
+                }
+
+            }
+
+            return false;
 
         },
 
 
-        isInDatabase: function(daWord, inD, z){
-            var oReq = new XMLHttpRequest();
-            oReq.open("POST", "api/Word", true);
-            oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            oReq.send("werd=" + daWord + "&inDict=" + inD + "&def=" + z);
+        isInDatabase: function(daWord){
+            for (var x = 0; x < dictList1.length; x++) {
+
+                if (daWord === dictList1[x].name) {
+
+                    // If in dictionary then create word and definition string
+
+                    var declareDef = dictList1[x].name + " - Definition: " + dictList1[x].definition;
+                    return declareDef;
+                }
+            }
+            return "-1";
         },
 
 
@@ -729,18 +759,24 @@
 
         isInDictionary: function (daWord, x, y, cb) {
 
-            // Call Dictionary API
+            
 
-            this.xhrTest(daWord, function (definition) {
-                if ((definition) || (definition !== null)) {
-                    console.log("definition = " + definition);
-                    return cb(definition, x, y);
-                }
-                else {
-                    console.log("definition = -1");
-                    return cb("-1", x, y);
-                }
-            });
+                    // Call Dictionary API
+
+                    this.xhrTest(daWord, function (definition) {
+                        if ((definition) || (definition != null)) {
+                            console.log("definition = " + definition);
+                            return cb(definition, x, y);
+                        }
+                        else {
+                            console.log("definition = -1");
+                            return cb("-1", x, y);
+                        }
+                    });
+
+            // If not in array, then return -1 as String
+
+            
 
         },
 
@@ -803,7 +839,7 @@
             oReq.onreadystatechange = function () {
 
                 if (oReq.readyState === 4)
-                    Bricks.reqListener(oReq, word1, cb);
+                    Bricks.reqListener(oReq, word1, cb)
 
             };
 
