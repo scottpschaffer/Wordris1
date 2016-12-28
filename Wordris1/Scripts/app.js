@@ -654,9 +654,9 @@
                     // w contains current substring
                     if (cbStop) {
                         w = daWord.substring(x, y + 1);
-                        debugger;
+                        //debugger;
                         // If not in badWords array
-                        this.isGoodBadXHR(w, function (inDict) {
+                        Bricks.isGoodBadXHR(w, function (inDict) {
                             if (inDict !== "true") {
                                 if (inDict !== "-1") {
                                     nums.push(x);
@@ -671,7 +671,7 @@
                                     var ret = "";
                                     var inDictionary = false;
 
-                                    this.isInDictionary(w, x, y, function (z, q, r) {
+                                    Bricks.isInDictionary(w, x, y, function (z, q, r) {
                                         //debugger
                                         if (z !== "-1") {
                                             nums = [];
@@ -689,7 +689,7 @@
                                             inDictionary = false;
                                             ret = ["filler"];
                                         }
-                                        this.putInDictionary(w, inDictionary, z);
+                                        Bricks.putInDatabase(w, inDictionary, z);
                                         cb(ret);
                                     });
                                 }
@@ -704,26 +704,42 @@
 
         // Check if word is in Bad word array
 
-        isGoodBadXHR: function(Word2, cb) {
+        //isGoodBadXHR: function(Word2, cb) {
 
-            var oReq = new XMLHttpRequest();
-            oReq.onreadystatechange = function () {
-                if (oReq.readyState === 1)
-                    cb(oReq.response);
-            };
-            oReq.open("GET", "api/Word?werd=" + Word2);
-            oReq.send();
+        //    var oReq = new XMLHttpRequest();
+        //    oReq.onreadystatechange = function () {
+        //        if (oReq.readyState === 4)
+        //            cb(oReq.response);
+        //    };
+        //    oReq.open("GET", "api/Word?werd=" + Word2);
+        //    oReq.send();
 
+        //},
+
+        isGoodBadXHR: function(Word2, cb){
+            $.ajax({
+                url: "api/Word?werd=" + Word2,
+                method: "GET",
+            })
+            .done(function (result) {
+                console.log("QQQQQQQQQQQQQWWWWWWWWWWWWWWW " + result);
+            });
         },
 
+        //putInDatabase: function(daWord, inD, z){
+        //    var oReq = new XMLHttpRequest();
+        //    oReq.open("POST", "api/Word", true);
+        //    oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        //    oReq.send("werd=" + daWord + "&inDict=" + inD + "&def=" + z);
+        //},
 
-        isInDatabase: function(daWord, inD, z){
-            var oReq = new XMLHttpRequest();
-            oReq.open("POST", "api/Word", true);
-            oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            oReq.send("werd=" + daWord + "&inDict=" + inD + "&def=" + z);
+        putInDatabase: function(daWord, inD, z){
+            $.ajax({
+                method: "POST",
+                url: "api/Word",
+                data: "werd=" + daWord + "&inDict=" + inD + "&def=" + z
+            });
         },
-
 
         // Check if word in Dictionary API (currently just an array)
 

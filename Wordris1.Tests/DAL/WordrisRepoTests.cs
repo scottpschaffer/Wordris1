@@ -31,7 +31,7 @@ namespace Wordris1.Tests.DAL
             mock_context = new Mock<WordrisContext>();
             mock_words = new Mock<DbSet<Word>>();
             mock_scores = new Mock<DbSet<Score>>();
-            Repo = new MockRepository(mock_context.Object);
+           // Repo = new MockRepository(mock_context.Object);
 
 
         }
