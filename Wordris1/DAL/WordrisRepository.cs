@@ -22,15 +22,7 @@ namespace Wordris1.DAL
 
         public void AddWord(Word werd)
         {
-            Word new_word = new Models.Word
-            {
-                TheWord = werd.TheWord,
-                IsWord = werd.IsWord,
-                Definition = werd.Definition,
-                Usage = 1
-            };
-
-            Context.Words.Add(new_word);
+            Context.Words.Add(werd);
             Context.SaveChanges();
         }
 

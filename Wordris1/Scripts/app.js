@@ -588,25 +588,26 @@
             if (masterWords.length === 0) {
                 masterWords = cList;
             }
-
             else {
-
+                var x = 0;
                 // Parse list of words
                 cList.forEach(function (element, index, array)
                 {
                     if (element.word !== masterWords[index].word)
                     {
+                        x++;
                         //debugger
                         Bricks.findSubWord(element.word, function(coords)
                         {
                             //console.log("FindSubWord Coords = " + coords);
                             if (coords.length > 1) {
                                 var werd = element.numb;
-                               // console.log("element.word = " + element.word + "| werd = " + werd);
+                                console.log("element.numb: " + element.numb);
+                                // console.log("element.word = " + element.word + "| werd = " + werd);
                                 var removePart1 = werd.splice(coords[0], (coords[1] - coords[0]) + 1);
-                               // console.log("removePart1 = " + removePart1);
+                                // console.log("removePart1 = " + removePart1);
                                 score += Bricks.computeScore(removePart1);
-                               // console.log("QWERT - score" + score);
+                                // console.log("QWERT - score" + score);
                                 totalScore += score;
                                 scoreText.textContent = ("Score: " + totalScore);
                                 removePart1.sort(function (a, b) { return b - a });
@@ -614,11 +615,11 @@
                                     brix1.splice(removePart1[u], 1);
                                 }
                             }
-
                         });
                         // remove bricks
                         masterWords[index] = element;
                         cbStop = true;
+                        console.log("x is: " + x);
                     }
                 });
 
@@ -656,30 +657,30 @@
                         w = daWord.substring(x, y + 1);
                         //debugger;
                         // If not in badWords array
-                        Bricks.isGoodBadXHR(w, function (inDict) {
-                            if (inDict !== "true") {
-                                if (inDict !== "-1") {
-                                    nums.push(x);
-                                    nums.push(y);
-                                    defText.textContent = inDict;
-                                    cbStop = false;
-                                    cb(nums);
-                                }
-                                else {
-                                    var a = x;
-                                    var b = y;
-                                    var ret = "";
-                                    var inDictionary = false;
+                        //Bricks.isWordInDB(w, function (inDict) {
+                            //if (inDict !== "true") {
+                            //    if (inDict !== "-1") {
+                            //        nums.push(x);
+                            //        nums.push(y);
+                            //        defText.textContent = inDict;
+                            //        cbStop = false;
+                            //        cb(nums);
+                            //    }
+                            //    else {
+                            //        var a = x;
+                            //        var b = y;
+                            //        var ret = "";
+                            //        var inDictionary = false;
 
-                                    Bricks.isInDictionary(w, x, y, function (z, q, r) {
+                                    Bricks.callDictionaryAPI(w, x, y, function (z) {
                                         //debugger
                                         if (z !== "-1") {
                                             nums = [];
                                             // Return Start and Stop section of word that is in Dictionary
-                                            nums.push(q);
-                                            nums.push(r);
-                                           // console.log("pushed nums: " + nums);
-                                           // console.log("z = " + z);
+                                            nums.push(x);
+                                            nums.push(y);
+                                            // console.log("pushed nums: " + nums);
+                                            // console.log("z = " + z);
                                             defText.textContent = z;
                                             cbStop = false;
                                             inDictionary = true;
@@ -693,73 +694,33 @@
                                         cb(ret);
                                     });
                                 }
-                            }
-                        });
+                           // }
+                        //});
                     }
                 }
-            }
+            //}
         },
 
 
-
-        // Check if word is in Bad word array
-
-        //isGoodBadXHR: function(Word2, cb) {
-
-        //    var oReq = new XMLHttpRequest();
-        //    oReq.onreadystatechange = function () {
-        //        if (oReq.readyState === 4)
-        //            cb(oReq.response);
-        //    };
-        //    oReq.open("GET", "api/Word?werd=" + Word2);
-        //    oReq.send();
-
-        //},
-
-        isGoodBadXHR: function(Word2, cb){
+        isWordInDB: function(Word2, cb){
             $.ajax({
                 url: "api/Word?werd=" + Word2,
                 method: "GET",
             })
             .done(function (result) {
                 console.log("QQQQQQQQQQQQQWWWWWWWWWWWWWWW " + result);
+                cb;
             });
         },
 
-        //putInDatabase: function(daWord, inD, z){
-        //    var oReq = new XMLHttpRequest();
-        //    oReq.open("POST", "api/Word", true);
-        //    oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        //    oReq.send("werd=" + daWord + "&inDict=" + inD + "&def=" + z);
-        //},
 
         putInDatabase: function(daWord, inD, z){
             $.ajax({
                 method: "POST",
                 url: "api/Word",
-                data: "werd=" + daWord + "&inDict=" + inD + "&def=" + z
+                data: {TheWord: daWord, IsWord: inD, Definition: z}
             });
         },
-
-        // Check if word in Dictionary API (currently just an array)
-
-        isInDictionary: function (daWord, x, y, cb) {
-
-            // Call Dictionary API
-
-            this.xhrTest(daWord, function (definition) {
-                if ((definition) || (definition !== null)) {
-                    console.log("definition = " + definition);
-                    return cb(definition, x, y);
-                }
-                else {
-                    console.log("definition = -1");
-                    return cb("-1", x, y);
-                }
-            });
-
-        },
-
 
 
         moveBricksDown: function () {
@@ -781,57 +742,33 @@
         },
 
 
-
-        // Print out contents of API request
-
-        reqListener: function (dataReq, word, cb) {
-
-            //debugger
-            var definition = "";
-            var x = dataReq.response;
-
-            var obj = JSON.parse(x);
-
-            if (obj.results.length > 0){
-                if (obj.results[0].senses[0].definition) {
-                    cb(word + ": " + obj.results[0].senses[0].definition);
-                }
-                else{
-                    cb("-1");
-                } 
-            }
-            else {
-                console.log("obj.results.length = 0");
-                cb("-1");
-            }
-            console.log(obj);
-
-        },
-
-
-
-        // Make API XHR call
-
-        xhrTest: function (word1, cb) {
-
-            var oReq = new XMLHttpRequest();
-
-            oReq.onreadystatechange = function () {
-
-                if (oReq.readyState === 4)
-                    Bricks.reqListener(oReq, word1, cb);
-
-            };
-
-            oReq.open("GET", "http://api.pearson.com/v2/dictionaries/entries?headword=" + word1);
-
-            //"http://www.dictionaryapi.com/api/v1/references/collegiate/xml/" + word1 +"?key=16d591fc-9c27-4304-8057-5faeb1d1da35");
-
-            oReq.send();
-
-            console.log("oReq: " + oReq + " reqListener: ");
-
+        callDictionaryAPI: function (word1, x, y, cb) {
+            $.ajax({
+                url: "http://api.pearson.com/v2/dictionaries/entries?headword=" + word1,
+                method: "GET"
+            }).done(function (response) {
+                    if (response.results.length > 0)
+                    {
+                        if (response.results[(response.results.length - 1)].senses[0].definition)
+                        {
+                            defText.textContent = word1 + ": " + response.results[(response.results.length - 1)].senses[0].definition;
+                            cbStop = false;
+                            cb(word1 + ": " + response.results[(response.results.length - 1)].senses[0].definition, x, y);
+                        }
+                        else
+                        {
+                            cb("-1");
+                        }
+                    }
+                    else
+                    {
+                        cb("-1");
+                    }
+            });
         }
+
+        //    //"http://www.dictionaryapi.com/api/v1/references/collegiate/xml/" + word1 +"?key=16d591fc-9c27-4304-8057-5faeb1d1da35");
+
 
     };
 

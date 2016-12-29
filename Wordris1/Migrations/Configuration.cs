@@ -4,6 +4,7 @@ namespace Wordris1.Migrations
     using System.Data.Entity;
     using System.Data.Entity.Migrations;
     using System.Linq;
+    using Wordris1.Models;
 
     internal sealed class Configuration : DbMigrationsConfiguration<Wordris1.DAL.WordrisContext>
     {
@@ -26,6 +27,10 @@ namespace Wordris1.Migrations
             //      new Person { FullName = "Rowan Miller" }
             //    );
             //
+            context.Words.AddOrUpdate(
+                p => p.TheWord,
+                new Word { TheWord = "TAT", IsWord = true, Definition = "A slangword for tatoo", Usage = 1 }
+                );
         }
     }
 }
