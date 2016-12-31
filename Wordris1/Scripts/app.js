@@ -491,15 +491,16 @@
                         cbStop = true;
                         w.forEach(function (element1, index1, array1) {
                             if (cbStop) {
+
                                 $.ajax({
-                                    url: "http://api.pearson.com/v2/dictionaries/entries?headword=" + element1.word,
+                                    url: "api/Word?werd=" + element1.word,
                                     method: "GET"
-                                }).done(function (response) {
-                                    if (response.results.length > 0) {
-                                        if (response.results[(response.results.length - 1)].senses[0].definition) {
+                                }).done(function (result) {
+                                    if (result !== "true") {
+                                        if (result !== "-1") {
                                             if (cbStop) {
                                                 cbStop = false;
-                                                defText.textContent = element1.word + ": " + response.results[(response.results.length - 1)].senses[0].definition;
+                                                defText.textContent = "DB! " + element1.word + ": " + result;
                                                 var goodWord = element.word.substring(element1.coords[0], element1.coords[1] + 1);
                                                 newWord = (element.word).replace(goodWord, "");
                                                 score += Bricks.computeScore(element1.brickNums);
@@ -518,12 +519,56 @@
                                                 v = ({ word: newWord, numb: element.numb });
                                             }
                                         }
+                                        else
+                                        {
+                                            var inDict = false;
+                                            var def = "-1";
+                                            $.ajax({
+                                                url: "http://api.pearson.com/v2/dictionaries/entries?headword=" + element1.word,
+                                                method: "GET"
+                                            }).done(function (response) {
+                                                if (response.results.length > 0) {
+                                                    if (response.results[(response.results.length - 1)].senses[0].definition) {
+                                                        if (cbStop) {
+                                                            cbStop = false;
+                                                            def = response.results[(response.results.length - 1)].senses[0].definition;
+                                                            inDict = true;
+                                                            defText.textContent = element1.word + ": " + def;
+
+                                                            // Remove the word from the canvas and from list of words
+                                                            var goodWord = element.word.substring(element1.coords[0], element1.coords[1] + 1);
+                                                            newWord = (element.word).replace(goodWord, "");
+                                                            score += Bricks.computeScore(element1.brickNums);
+                                                            totalScore += score;
+                                                            scoreText.textContent = ("Score: " + totalScore);
+                                                            element1.brickNums.sort(function (a, b) { return b - a });
+                                                            for (var u = 0; u < element1.brickNums.length; u++) {
+                                                                brix1.splice(element1.brickNums[u], 1);
+                                                                for (var uu = 0; uu < element.numb.length; uu++) {
+                                                                    if (element.numb[uu] === element1.brickNums[u]) {
+                                                                        element.numb.splice(uu, 1);
+                                                                        break;
+                                                                    }
+                                                                }
+                                                            }
+                                                            v = ({ word: newWord, numb: element.numb });
+                                                        }
+                                                    }
+                                                }
+                                                else {
+                                                    console.log("Waaaaah - " + element1.word + "is not a word");
+                                                    inDict = false;
+                                                    def = "-1";
+                                                }
+                                                // Write to DB
+                                                $.ajax({
+                                                    method: "POST",
+                                                    url: "api/Word",
+                                                    data: { TheWord: element1.word, IsWord: inDict, Definition: def }
+                                                });
+                                            });
+                                        }
                                     }
-                                    else
-                                    {
-                                        console.log("Waaaaah - " + element1.word + "is not a word")
-                                    }
-                                    // Write to DB
                                 });
                             }
                             
