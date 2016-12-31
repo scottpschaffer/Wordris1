@@ -1,7 +1,5 @@
 ﻿(function () {
 
-
-
     window.requestAnimFrame = (function () {
         return window.requestAnimationFrame ||
         window.webkitRequestAnimationFrame ||
@@ -15,36 +13,27 @@
 
     })();
 
-
-
     // Residing place for our Canvas' context
-
     var ctx = null;
 
     // Array of bricks
-
     var brix1 = [];
 
     // Array of words that will be compared against to determine what has changed
-
     var masterWords = [];
 
     // Array of bad words to compare against
-
     var badWords = [];
 
     // Array temporarily acting as dictionary in place of DB
-
     var dictList1 = [
 
                     { name: "BAABC", definition: "Test bad word with API" },
 
                     { name: "CACA", definition: "The poop" }];
 
-    // Letters of Alaphabet usable
-
+    // Letters of Alphabet usable
     var letters = ["A", "B", "C", "T"];
-
     //, "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
 
     var letterValues = [{letter: "A", value: 1}, {letter: "B", value: 2},{letter: "C", value: 3},{letter: "D", value: 1},{letter: "E", value: 1}, {letter: "F", value: 1}, {letter: "G", value: 1}, {letter: "H", value: 1},
@@ -53,21 +42,19 @@
         {letter: "Y", value: 1}, {letter: "Z", value: 1}];
 
     var colors = ["red", "orange", "green", "purple", "blue"];
-
     var upcomingLetters = [];
 
     // Used to allow game to replay
     var again = true;
 
     // Area where HTML where definition is displayed
-
     var defText;
     var scoreText;
 
+    // prevent AJAX calls from repeating word-processing code
     var cbStop = true;
 
     var totalScore = 0;
-
     var highScorePlayers = [];
     var playerList = [];
 
@@ -99,12 +86,11 @@
 
             }
 
-            // Div where Word Definition will go
+            // Div where Word Definition and score will go
             defText = document.getElementById('def');
             scoreText = document.getElementById('tScore');
 
         },
-
 
 
         init: function () {
@@ -113,7 +99,6 @@
             FallingBrick.init();
 
         },
-
 
 
         runGame: function () {
@@ -128,7 +113,6 @@
         },
 
 
-
         restartGame: function () {
 
             again = true;
@@ -136,56 +120,44 @@
         },
 
 
-
         animate: function () {
 
             Game.play = requestAnimFrame(Game.animate);
-
             if (again) {
                 Game.draw();
             }
         },
 
 
-
         draw: function () {
 
             // Clear out old Game
             ctx.clearRect(0, 0, this.width, this.height);
-
             // Draw the new Falling Brick
             FallingBrick.draw();
-
             // Draw the bricks that already fell
             Bricks.draw();
 
         }
-
     };
-
 
 
     var Screen = {
 
         // Contents of Welcome Screen
-
         welcome: function () {
 
             // Setup base values
-
             this.text = 'Wordris';
             this.textSub = 'Click To Start';
             this.textColor = 'white';
-
             // Create screen
             this.create();
 
         },
 
 
-
         // Contents of Game Over screen
-
         gameover: function () {
 
             this.text = 'Game Over';
@@ -205,6 +177,7 @@
             }
             
         },
+
 
         highScoreA: function(pl){
             var hsPlayers = [];
@@ -236,6 +209,7 @@
             return hsPlayers;
         },
 
+
         // Create the Welcome or Game Over screen
         create: function () {
 
@@ -255,7 +229,6 @@
             ctx.fillText(this.textSub, Game.width / 2, Game.height / 2 + 30);
 
         }
-
     };
 
 
@@ -267,14 +240,11 @@
         // Line that bricks can't go over
         limit: 100,
 
-
         // Where Falling Brick starts falling along with setting its letter and color
-
         init: function () {
 
             this.x = 100;
             this.y = 100;
-
             this.speed = 5;
 
             var fallBrick = this.organize();
@@ -282,6 +252,7 @@
             this.color = fallBrick.c;
 
         },
+
 
         organize: function () {
             // Check if 9 items in list otherwise insert howevermuch is left => 9 - falling brick = 8
@@ -296,8 +267,8 @@
             return upcomingLetters.shift();
         },
 
-        // Draws and re-draws the falling brick as its location moves
 
+        // Draws and re-draws the falling brick as its location moves
         draw: function () {
             // Move the Brick, if possible
             this.move();
@@ -329,108 +300,64 @@
         },
 
 
-
         // Controls side-to-side movement while monitoring sides of wall (canvas)
-
         move: function () {
 
             // Detect controller input
-
             if (Ctrl.left && (this.x < Game.width - (this.w))) {
-
                 this.x += this.speed;
-
             } else if (Ctrl.right && this.x > 0) {
-
                 this.x += -this.speed;
-
             }
 
             // If falling brick is not at bottom AND there is no collision with a fallen brick
-
             if ((this.y < (Game.height - this.h)) && !(Bricks.collide(this.x, this.y))) {
-
                 // Falling Brick moves down by 1
-
                 this.y += 1;
-
             }
-
             else {
-
                 // If brick reached bottom or hit a fallen brick, then save brick to Brix1 array
-
                 Bricks.save(this.x, this.y, this.letter, this.color);
 
                 // Go through newly-fallen brick processing
-
                 Bricks.process();
 
-
-
                 // If newly-fallen brick is over the limit (game-ending line)
-
                 if (this.y <= FallingBrick.limit) {
-                    console.log("again=false");
+
                     // Empty fallen-bricks array
-
                     brix1 = [];
-
                     // Add Mouse-click Event Listener
-
                     Game.canvas.addEventListener('click', Game.restartGame, false);
 
                     // Put up Gameover screen
-
                     Screen.gameover();
                     totalScore = 0;
                     defText.textContent = "";
                     scoreText.textContent = "";
                     // Again is false so game doesn't restart automatically
-
                     again = false;
-
-                    console.log("again=false");
-
                     return;
 
                 }
-
                 else {
-
                     // If not at or over gameover line, then start again with new falling brick
-
                     Game.init();
                 }
-
-
-
             }
-
-
-
         }
-
-
-
     };
-
 
 
     var Bricks = {
 
         // Probably need to remove this eventually
-
         init: function () {
-
-
 
         },
 
 
-
         // Saving newly-fallen brick to Brix1 array (save coords, letter, and color)
-
         save: function (x1, y1, l1, c1) {
 
             brix1.push({ x: x1, y: y1, l: l1, c: c1 });
@@ -438,75 +365,51 @@
         },
 
 
-
         draw: function () {
 
             // Iterate through Brick array and draw them
-
             for (var i = 0; i < brix1.length; i++) {
 
                 ctx.fillStyle = brix1[i].c;
-
                 ctx.fillRect(brix1[i].x, brix1[i].y, 50, 20);
-
                 ctx.fillStyle = "white";
-
                 ctx.fillText(brix1[i].l, brix1[i].x + 25, brix1[i].y + 15, 20);
 
             }
-
         },
-
 
 
         collide: function (x2, y2) {
 
             // Take coords of falling brick and compare them to location and dimensions of bricks
-
             for (var j = 0; j < brix1.length; j++) {
 
                 if ((((x2 + 50) > brix1[j].x) && ((x2 + 50) <= (brix1[j].x + 50)) || (x2 >= brix1[j].x) && (x2 < (brix1[j].x + 50))) && (((y2 + 20) >= brix1[j].y) && ((y2 + 20) <= (brix1[j].y + 20)))) {
 
                     return true;
-
                 }
-
             }
-
             return false;
-
         },
-
 
 
         // This needs to be separate from collide because brick already in Brix1 and has to skip itself
-
         collide2: function (x2, y2, n2) {
 
             for (var j = 0; j < brix1.length; j++) {
-
                 // Prevent Brick from comparing itself 
-
                 if (j !== n2) {
-
                     if ((((x2 + 50) > brix1[j].x) && ((x2 + 50) <= (brix1[j].x + 50)) || (x2 >= brix1[j].x) && (x2 < (brix1[j].x + 50))) && (((y2 + 20) >= brix1[j].y) && ((y2 + 20) <= (brix1[j].y + 20)))) {
 
                         return true;
-
                     }
-
                 }
-
             }
-
             return false;
-
         },
 
 
-
         // Process gets list of words, checks if there are words, then moves down any bricks not removed because word formed
-
         process: function () {
 
             var words = this.getListOfWords();
@@ -517,11 +420,9 @@
         },
 
 
-
         getListOfWords: function () {
 
             var temp1 = [];
-
             var temp2 = [];
 
             // From 530 (top) to 210 (limit of bricks)
@@ -531,59 +432,38 @@
                 temp2 = [];
 
                 // 410 is width of canvas minus 50 (width of brick) = 360
-
                 for (var x = 0; x < (Game.width - 50); x++) {
 
                     // Go through every brick in list
-
                     for (var n = 0; n < brix1.length; n++) {
 
                         // If x/y corner of brick matches anything in list of bricks
-
                         if ((x === brix1[n].x) && (y === brix1[n].y)) {
 
                             // Add the letter and brick # to list
-
                             temp2.push({ letters: brix1[n].l, number: n });
-
                         }
-
                     }
-
                 }
 
                 var temp3 = [];
                 var temp4 = [];
-
                 for (var z = 0; z < temp2.length; z++) {
-
                     // Have to use these arrays because can't join on temp2[z].letters
-
                     temp3.push(temp2[z].letters);
-
                     temp4.push(temp2[z].number);
-
                 }
-
                 // Return list of words and the block numbers that make up each word (used for deletions)
-
                 temp1.push({ word: (temp3.join("")), numb: temp4 });
-
             }
-
             return temp1;
 
         },
 
 
-
         checkIfWords: function (cList) {
 
             var score = 0;
-            //console.log("Start score" + score);
-            var coords = [];
-            //coords.sort;
-
             // In beginning, there is no masterWords yet use first list of words
             if (masterWords.length === 0) {
                 masterWords = cList;
@@ -593,38 +473,67 @@
                 // Parse list of words
                 cList.forEach(function (element, index, array)
                 {
+                    var w = [];
+                    var v = element;
+                    var newWord = "";
                     if (element.word !== masterWords[index].word)
                     {
-                        x++;
-                        //debugger
-                        Bricks.findSubWord(element.word, function(coords)
+                        for (var x = 0; x < (element.word.length - 2) ; x++)
                         {
-                            //console.log("FindSubWord Coords = " + coords);
-                            if (coords.length > 1) {
-                                var werd = element.numb;
-                                console.log("element.numb: " + element.numb);
-                                // console.log("element.word = " + element.word + "| werd = " + werd);
-                                var removePart1 = werd.splice(coords[0], (coords[1] - coords[0]) + 1);
-                                // console.log("removePart1 = " + removePart1);
-                                score += Bricks.computeScore(removePart1);
-                                // console.log("QWERT - score" + score);
-                                totalScore += score;
-                                scoreText.textContent = ("Score: " + totalScore);
-                                removePart1.sort(function (a, b) { return b - a });
-                                for (var u = 0; u < removePart1.length; u++) {
-                                    brix1.splice(removePart1[u], 1);
-                                }
+                            for (var y = (element.word.length - 1); y > x; y--)
+                            {
+                                var werd = element.word.substring(x, y + 1);
+                                var brickNumz = element.numb.slice(x, y + 1);
+                                var coords = [x, y];
+                                w.push({ word: werd, brickNums: brickNumz, coords: coords });
                             }
-                        });
-                        // remove bricks
-                        masterWords[index] = element;
+                        }
                         cbStop = true;
-                        console.log("x is: " + x);
+                        w.forEach(function (element1, index1, array1) {
+                            if (cbStop) {
+                                $.ajax({
+                                    url: "http://api.pearson.com/v2/dictionaries/entries?headword=" + element1.word,
+                                    method: "GET"
+                                }).done(function (response) {
+                                    if (response.results.length > 0) {
+                                        if (response.results[(response.results.length - 1)].senses[0].definition) {
+                                            if (cbStop) {
+                                                cbStop = false;
+                                                defText.textContent = element1.word + ": " + response.results[(response.results.length - 1)].senses[0].definition;
+                                                var goodWord = element.word.substring(element1.coords[0], element1.coords[1] + 1);
+                                                newWord = (element.word).replace(goodWord, "");
+                                                score += Bricks.computeScore(element1.brickNums);
+                                                totalScore += score;
+                                                scoreText.textContent = ("Score: " + totalScore);
+                                                element1.brickNums.sort(function (a, b) { return b - a });
+                                                for (var u = 0; u < element1.brickNums.length; u++) {
+                                                    brix1.splice(element1.brickNums[u], 1);
+                                                    for (var uu = 0; uu < element.numb.length; uu++) {
+                                                        if (element.numb[uu] === element1.brickNums[u]) {
+                                                            element.numb.splice(uu, 1);
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                v = ({ word: newWord, numb: element.numb });
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        console.log("Waaaaah - " + element1.word + "is not a word")
+                                    }
+                                    // Write to DB
+                                });
+                            }
+                            
+                        });
                     }
+                    masterWords[index] = v;
                 });
-
             }
         },
+
 
         computeScore: function(rp1)
         {
@@ -636,69 +545,12 @@
                     if (letterValues[j].letter === brix1[rp1[i]].l)
                     {
                         score1 += letterValues[j].value;
+                        break;
                     }
                 }
             }
             //console.log("score1 = " + score1);
             return score1;
-        },
-
-        findSubWord: function (daWord, cb) {
-
-            var w;
-            var nums = [];
-
-            // daword.length - 2 because ignore words that are 1 letter long
-            for (var x = 0; x < (daWord.length - 2); x++) {
-                // Start from end of word and go backwards
-                for (var y = (daWord.length - 1); y > x; y--) {
-                    // w contains current substring
-                    if (cbStop) {
-                        w = daWord.substring(x, y + 1);
-                        //debugger;
-                        // If not in badWords array
-                        //Bricks.isWordInDB(w, function (inDict) {
-                            //if (inDict !== "true") {
-                            //    if (inDict !== "-1") {
-                            //        nums.push(x);
-                            //        nums.push(y);
-                            //        defText.textContent = inDict;
-                            //        cbStop = false;
-                            //        cb(nums);
-                            //    }
-                            //    else {
-                            //        var a = x;
-                            //        var b = y;
-                            //        var ret = "";
-                            //        var inDictionary = false;
-
-                                    Bricks.callDictionaryAPI(w, x, y, function (z) {
-                                        //debugger
-                                        if (z !== "-1") {
-                                            nums = [];
-                                            // Return Start and Stop section of word that is in Dictionary
-                                            nums.push(x);
-                                            nums.push(y);
-                                            // console.log("pushed nums: " + nums);
-                                            // console.log("z = " + z);
-                                            defText.textContent = z;
-                                            cbStop = false;
-                                            inDictionary = true;
-                                            ret = nums;
-                                        }
-                                        else {
-                                            inDictionary = false;
-                                            ret = ["filler"];
-                                        }
-                                        Bricks.putInDatabase(w, inDictionary, z);
-                                        cb(ret);
-                                    });
-                                }
-                           // }
-                        //});
-                    }
-                }
-            //}
         },
 
 
