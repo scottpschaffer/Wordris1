@@ -166,47 +166,47 @@
             this.create();
             console.log("playerList.length before=" + playerList.length);
             var player = prompt("Your score is " + totalScore + ". Please enter your name", "Player Name");
-            playerList.push({ p: player, s: totalScore });
-            console.log("playerList.length after=" + playerList.length);
-            highScorePlayers = this.highScoreA(playerList);
-            console.log("playerList.length=afterafter = " + playerList.length);
-            ctx.fillStyle = "lawngreen";
-            for (var x = 0; x < highScorePlayers.length; x++)
+            $.ajax({
+                method: "POST",
+                url: "api/Score",
+                data: { PlayerName: player, PlayerScore: totalScore }
+            }).done(function (result)
             {
-                ctx.fillText((x + 1) + ". " + highScorePlayers[0].p + ": " + highScorePlayers[0].s, Game.width / 2, Game.height / 2 + (50 * (x + 1)));
-            }
-            
-        },
-
-
-        highScoreA: function(pl){
-            var hsPlayers = [];
-            var tempLocation = 0;
-            for (x = 0; x < 5; x++)
-            {
-                if (pl.length > 0)
+                $.ajax({
+                    url: "api/Score",
+                    method: "GET"
+                }).done(function (players)
                 {
-                    var tempScore = pl[0].s;
-                    var numb = 0;
-                    while (numb < pl.length)
+                    console.log("Players= " + players);
+                    debugger;
+                    ctx.fillStyle = "lawngreen";
+                    var tempLocation = 0;
+                    for (var x = 0; x < 5; x++)
                     {
-                        if (tempScore < pl[numb].s)
+                        if (players.length > 0)
                         {
-                            tempScore = pl[numb].s;
-                            tempLocation = numb;
+                            var tempScore = players[0].PlayerScore;
+                            var numb = 0;
+                            while (numb < players.length)
+                            {
+                                if (tempScore < players[numb].PlayerScore)
+                                {
+                                    tempScore = players[numb].PlayerScore;
+                                    tempLocation = numb;
+                                }
+                                numb++;
+                            }
+                            ctx.fillText((x + 1) + "." + players[tempLocation].PlayerName + ": " + players[tempLocation].PlayerScore, Game.width / 2, Game.height / 2 + (50 * (x + 1)));
+                            players.splice(tempLocation, 1);
                         }
-                        numb++;
+                        else
+                        {
+                            break;
+                        }
                     }
-                    hsPlayers.push({ p: pl[tempLocation].p, s: pl[tempLocation].s });
-                    pl.splice(tempLocation, 1);
-                }
-                else
-                {
-                    break;
-                }
-            }
-            console.log("hsPlayers.length: " + hsPlayers.length);
-            return hsPlayers;
+
+                });
+            });
         },
 
 
@@ -636,37 +636,9 @@
 
             }
 
-        },
-
-
-        callDictionaryAPI: function (word1, x, y, cb) {
-            $.ajax({
-                url: "http://api.pearson.com/v2/dictionaries/entries?headword=" + word1,
-                method: "GET"
-            }).done(function (response) {
-                    if (response.results.length > 0)
-                    {
-                        if (response.results[(response.results.length - 1)].senses[0].definition)
-                        {
-                            defText.textContent = word1 + ": " + response.results[(response.results.length - 1)].senses[0].definition;
-                            cbStop = false;
-                            cb(word1 + ": " + response.results[(response.results.length - 1)].senses[0].definition, x, y);
-                        }
-                        else
-                        {
-                            cb("-1");
-                        }
-                    }
-                    else
-                    {
-                        cb("-1");
-                    }
-            });
         }
 
         //    //"http://www.dictionaryapi.com/api/v1/references/collegiate/xml/" + word1 +"?key=16d591fc-9c27-4304-8057-5faeb1d1da35");
-
-
     };
 
 

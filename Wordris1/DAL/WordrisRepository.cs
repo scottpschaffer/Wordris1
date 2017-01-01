@@ -76,9 +76,9 @@ namespace Wordris1.DAL
             return Context.Scores.Select(u => u.PlayerScore).ToList();
         }
 
-        public List<string> GetPlayerNames()
+        public List<Score> GetScores()
         {
-            return Context.Scores.Select(u => u.PlayerName).ToList();
+            return Context.Scores.ToList();
         }
     }
 }

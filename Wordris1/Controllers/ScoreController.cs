@@ -17,25 +17,25 @@ namespace Wordris1.Controllers
         WordrisRepository Repo = new WordrisRepository();
 
         // GET api/<controller>
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
+        //public IEnumerable<string> Get()
+        //{
+        //    return new string[] { "value1", "value2" };
+        //}
 
         // GET api/<controller>/5
-        public List<Score> Get(int id)
+        public List<Score> Get()
         {
-            List<Score> ret_score = new List<Score>();
-            Score tempScore = new Models.Score();
-            List<int> scoreNums = Repo.GetPlayerScores();
-            List<string> scoreNames = Repo.GetPlayerNames();
-            for (var x = 0; x < scoreNums.Count; x++)
-            {
-                tempScore.PlayerName = scoreNames[x];
-                tempScore.PlayerScore = scoreNums[x];
-                ret_score.Add(tempScore);
-            }
-            return ret_score;
+            //List<Score> ret_score = new List<Score>();
+            //Score tempScore = new Score();
+            //List<int> scoreNums = Repo.GetPlayerScores();
+            //List<string> scoreNames = Repo.GetPlayerNames();
+            //for (var x = 0; x < scoreNums.Count; x++)
+            //{
+            //    tempScore.PlayerName = scoreNames[x];
+            //    tempScore.PlayerScore = scoreNums[x];
+            //    ret_score.Add(tempScore);
+            //}
+            return Repo.GetScores();
         }
 
         // POST api/<controller>
