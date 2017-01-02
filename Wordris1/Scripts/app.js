@@ -33,13 +33,12 @@
                     { name: "CACA", definition: "The poop" }];
 
     // Letters of Alphabet usable
-    var letters = ["A", "B", "C", "T"];
-    //, "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+    var letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
 
-    var letterValues = [{letter: "A", value: 1}, {letter: "B", value: 2},{letter: "C", value: 3},{letter: "D", value: 1},{letter: "E", value: 1}, {letter: "F", value: 1}, {letter: "G", value: 1}, {letter: "H", value: 1},
-        {letter: "I", value: 1}, {letter: "J", value: 1}, {letter: "K", value: 1}, {letter: "L", value: 1}, {letter: "M", value: 1}, {letter: "N", value: 1}, {letter: "O", value: 1}, {letter: "P", value: 1},
-        {letter: "Q", value: 1}, {letter: "R", value: 1}, {letter: "S", value: 1},{letter: "T", value: 1}, {letter: "U", value: 1}, {letter: "V", value: 1}, {letter: "W", value: 1}, {letter: "X", value: 1},
-        {letter: "Y", value: 1}, {letter: "Z", value: 1}];
+    var letterValues = [{letter: "A", value: 1}, {letter: "B", value: 3},{letter: "C", value: 3},{letter: "D", value: 2},{letter: "E", value: 1}, {letter: "F", value: 4}, {letter: "G", value: 2}, {letter: "H", value: 4},
+        {letter: "I", value: 1}, {letter: "J", value: 8}, {letter: "K", value: 5}, {letter: "L", value: 1}, {letter: "M", value: 3}, {letter: "N", value: 1}, {letter: "O", value: 1}, {letter: "P", value: 3},
+        {letter: "Q", value: 10}, {letter: "R", value: 1}, {letter: "S", value: 1},{letter: "T", value: 1}, {letter: "U", value: 1}, {letter: "V", value: 4}, {letter: "W", value: 4}, {letter: "X", value: 8},
+        {letter: "Y", value: 4}, {letter: "Z", value: 10}];
 
     var colors = ["red", "orange", "green", "purple", "blue"];
     var upcomingLetters = [];
@@ -178,31 +177,26 @@
                 }).done(function (players)
                 {
                     console.log("Players= " + players);
-                    debugger;
+                    //debugger;
                     ctx.fillStyle = "lawngreen";
-                    var tempLocation = 0;
-                    for (var x = 0; x < 5; x++)
+                    
+                    for (var x = 0; x < 3; x++)
                     {
-                        if (players.length > 0)
+                        var tempScore = players[0].PlayerScore;
+                        var tempLocation = 0;
+                        if (players.length > 1)
                         {
-                            var tempScore = players[0].PlayerScore;
-                            var numb = 0;
-                            while (numb < players.length)
+                            for (y = 1; y < players.length; y++)
                             {
-                                if (tempScore < players[numb].PlayerScore)
+                                if (tempScore < players[y].PlayerScore)
                                 {
-                                    tempScore = players[numb].PlayerScore;
-                                    tempLocation = numb;
+                                    tempScore = players[y].PlayerScore;
+                                    tempLocation = y;
                                 }
-                                numb++;
                             }
-                            ctx.fillText((x + 1) + "." + players[tempLocation].PlayerName + ": " + players[tempLocation].PlayerScore, Game.width / 2, Game.height / 2 + (50 * (x + 1)));
-                            players.splice(tempLocation, 1);
                         }
-                        else
-                        {
-                            break;
-                        }
+                        ctx.fillText("High Score #" + (x + 1) + " = " + players[tempLocation].PlayerName + ": " + players[tempLocation].PlayerScore, Game.width / 2, Game.height / 2 + (60 * (x + 1)));
+                        players.splice(tempLocation, 1);
                     }
 
                 });
@@ -500,7 +494,7 @@
                                         if (result !== "-1") {
                                             if (cbStop) {
                                                 cbStop = false;
-                                                defText.textContent = "DB! " + element1.word + ": " + result;
+                                                defText.textContent = " From Database - " + element1.word + ": " + result;
                                                 var goodWord = element.word.substring(element1.coords[0], element1.coords[1] + 1);
                                                 newWord = (element.word).replace(goodWord, "");
                                                 score += Bricks.computeScore(element1.brickNums);
