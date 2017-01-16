@@ -33,7 +33,7 @@
                     { name: "CACA", definition: "The poop" }];
 
     // Letters of Alphabet usable
-    var letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+    var letters = ["A", "A", "B", "C", "D", "E", "E", "F", "G", "H", "I", "I", "J", "K", "L", "M", "N", "O", "O", "P", "Q", "R", "S", "T", "U", "U", "V", "W", "X", "Y", "Z"];
 
     var letterValues = [{letter: "A", value: 1}, {letter: "B", value: 3},{letter: "C", value: 3},{letter: "D", value: 2},{letter: "E", value: 1}, {letter: "F", value: 4}, {letter: "G", value: 2}, {letter: "H", value: 4},
         {letter: "I", value: 1}, {letter: "J", value: 8}, {letter: "K", value: 5}, {letter: "L", value: 1}, {letter: "M", value: 3}, {letter: "N", value: 1}, {letter: "O", value: 1}, {letter: "P", value: 3},
@@ -46,7 +46,7 @@
     // Used to allow game to replay
     var again = true;
 
-    // Area where HTML where definition is displayed
+    // Area where HTML definitions are displayed
     var defText;
     var scoreText;
 
@@ -85,7 +85,7 @@
 
             }
 
-            // Div where Word Definition and score will go
+            // Div where Word definition and score will go
             defText = document.getElementById('def');
             scoreText = document.getElementById('tScore');
 
@@ -163,31 +163,36 @@
             this.textSub = 'Click To Retry';
             this.textColor = 'red';
             this.create();
-            console.log("playerList.length before=" + playerList.length);
+            
             var player = prompt("Your score is " + totalScore + ". Please enter your name", "Player Name");
+
+            // Write player/score to DB
             $.ajax({
                 method: "POST",
                 url: "api/Score",
                 data: { PlayerName: player, PlayerScore: totalScore }
             }).done(function (result)
             {
+                // Get all player/score rows
                 $.ajax({
                     url: "api/Score",
                     method: "GET"
                 }).done(function (players)
                 {
-                    console.log("Players= " + players);
-                    //debugger;
                     ctx.fillStyle = "lawngreen";
                     
+                    // Write top 3 players and their scores
                     for (var x = 0; x < 3; x++)
                     {
+                        // Assign first player to tempScore
                         var tempScore = players[0].PlayerScore;
                         var tempLocation = 0;
+                        // If more than 1 player
                         if (players.length > 1)
                         {
                             for (y = 1; y < players.length; y++)
                             {
+                                // If larger score found, assign to tempScore and record location to tempLocation
                                 if (tempScore < players[y].PlayerScore)
                                 {
                                     tempScore = players[y].PlayerScore;
@@ -195,7 +200,9 @@
                                 }
                             }
                         }
+                        // write high score to canvas
                         ctx.fillText("High Score #" + (x + 1) + " = " + players[tempLocation].PlayerName + ": " + players[tempLocation].PlayerScore, Game.width / 2, Game.height / 2 + (60 * (x + 1)));
+                        // remove player from list of Players so it's no longer compared
                         players.splice(tempLocation, 1);
                     }
 
@@ -225,7 +232,7 @@
         }
     };
 
-
+    // The brick that is falling
     var FallingBrick = {
 
         // Dimensions of a brick
@@ -247,7 +254,7 @@
 
         },
 
-
+        // This function creates the list of 9 upcoming bricks
         organize: function () {
             // Check if 9 items in list otherwise insert howevermuch is left => 9 - falling brick = 8
             //debugger;
@@ -272,7 +279,7 @@
                 ctx.fillStyle = 'black';
                 ctx.fillRect(0, 0, Game.width, Game.height);
 
-                // Upcoming Bricks section
+                // Upcoming Bricks section drawn
                 ctx.fillStyle = "gray";
                 ctx.fillRect(Game.width, 0, 90, Game.height);
                 ctx.fillStyle = "white";
@@ -283,7 +290,7 @@
                     ctx.fillStyle = "white";
                     ctx.fillText(upcomingLetters[b].l, Game.width + 45, (b + 1) * 50 + 37, 20);
                 }
-                // Paint Brick
+                // Paint the falling Brick
                 ctx.fillStyle = this.color;
                 ctx.fillRect(this.x, this.y, this.w, this.h);
 
@@ -297,7 +304,7 @@
         // Controls side-to-side movement while monitoring sides of wall (canvas)
         move: function () {
 
-            // Detect controller input
+            // Detect controller input and x coord is between the walls of canvas
             if (Ctrl.left && (this.x < Game.width - (this.w))) {
                 this.x += this.speed;
             } else if (Ctrl.right && this.x > 0) {
@@ -329,7 +336,7 @@
                     totalScore = 0;
                     defText.textContent = "";
                     scoreText.textContent = "";
-                    // Again is false so game doesn't restart automatically
+                    // again is false so game doesn't restart automatically
                     again = false;
                     return;
 
@@ -342,7 +349,7 @@
         }
     };
 
-
+    // The bricks at the bottom that are finished falling
     var Bricks = {
 
         // Probably need to remove this eventually
@@ -387,7 +394,9 @@
         },
 
 
-        // This needs to be separate from collide because brick already in Brix1 and has to skip itself
+        // This needs to be separate from collide because brick already in Brix1 and has to
+        // skip itself. Used when determining if remaining bricks need to fall when bricks
+        // below disappear
         collide2: function (x2, y2, n2) {
 
             for (var j = 0; j < brix1.length; j++) {
@@ -403,7 +412,7 @@
         },
 
 
-        // Process gets list of words, checks if there are words, then moves down any bricks not removed because word formed
+        // Process gets list of words, checks if there are good words, then moves down any bricks not removed because word formed
         process: function () {
 
             var words = this.getListOfWords();
@@ -470,30 +479,44 @@
                     var w = [];
                     var v = element;
                     var newWord = "";
+                    // if element's word doesn't match masterWords' word, then change occurred
                     if (element.word !== masterWords[index].word)
                     {
+                        // word has to be at least 3 letters long
                         for (var x = 0; x < (element.word.length - 2) ; x++)
                         {
+                            // parse backwards until second letter of word
                             for (var y = (element.word.length - 1); y > x; y--)
                             {
+                                // word to compare is substring of original word
                                 var werd = element.word.substring(x, y + 1);
+                                // brickNumbs is array of the letter numbers making up sub-word
                                 var brickNumz = element.numb.slice(x, y + 1);
+                                // coords is the start and stop coords of sub-word relative to original word
                                 var coords = [x, y];
+                                // w is array ofpossible word combinations for word search in DB and Dictionary API
                                 w.push({ word: werd, brickNums: brickNumz, coords: coords });
                             }
                         }
+                        // cbStop used to prevent callbacks from executing when they shouldn't
                         cbStop = true;
                         w.forEach(function (element1, index1, array1) {
                             if (cbStop) {
-
+                                // first check Word DB table
                                 $.ajax({
                                     url: "api/Word?werd=" + element1.word,
                                     method: "GET"
                                 }).done(function (result) {
+                                    // result == true means its a bad word to be ignored
                                     if (result !== "true") {
+                                        // result == -1 means it's not a word in DB
                                         if (result !== "-1") {
+                                            // if result not bad or -1, then it found the word and has definition
+                                            // check again to prevent callbacks
                                             if (cbStop) {
+                                                // if got this far, then prevent repetition (through callbacks)
                                                 cbStop = false;
+                                                // Display definition
                                                 defText.textContent = " From Database - " + element1.word + ": " + result;
                                                 var goodWord = element.word.substring(element1.coords[0], element1.coords[1] + 1);
                                                 newWord = (element.word).replace(goodWord, "");
