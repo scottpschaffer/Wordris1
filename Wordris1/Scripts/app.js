@@ -81,8 +81,6 @@
                 this.canvas.addEventListener('click', this.runGame, false);
                 Ctrl.init();
 
-                //setTimeout(Ctrl.init, 100000);
-
             }
 
             // Div where Word definition and score will go
@@ -611,7 +609,7 @@
                     }
                 }
             }
-            //console.log("score1 = " + score1);
+            
             return score1;
         },
 
@@ -622,7 +620,6 @@
                 method: "GET",
             })
             .done(function (result) {
-                console.log("QQQQQQQQQQQQQWWWWWWWWWWWWWWW " + result);
                 cb;
             });
         },
@@ -655,7 +652,6 @@
 
         }
 
-        //    //"http://www.dictionaryapi.com/api/v1/references/collegiate/xml/" + word1 +"?key=16d591fc-9c27-4304-8057-5faeb1d1da35");
     };
 
 
@@ -738,13 +734,9 @@
 
             var mouseX = event.pageX;
 
-            //console.log(mouseX);
-
             var canvasX = Game.canvas.offsetLeft + Game.canvas.parentElement.offsetLeft;
 
             var FallingBrickMid = FallingBrick.w;
-
-            //console.log ("canvasX: " + canvasX + " FallingBrick.w: " + FallingBrick.w);
 
             if (mouseX > canvasX + FallingBrick.w &&
 
@@ -761,17 +753,6 @@
         }
 
     };
-
-
-
-    /*Key (Dictionary):
-    
-    Key (Student 4):
-    
-    16d591fc-9c27-4304-8057-5faeb1d1da35
-    
-    ff732ecd-23b1-4a56-a316-2aedfca4050c */
-
 
 
     window.onload = function () {
